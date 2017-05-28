@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<HttpMatcher>
+	<Matcher name="text">
+		<and>
+			<property type="request" name="method" value="GET" />
+			<property type="responseCode" value="200" />
+			<property type="response" name="Content-Type"
+				value="text/[\\w\\+\\-\\.]+|application/(xml|xhtml\\+xml|x-httpd-php|x-javascript|x-tcl|x-sh|x-csh|vnd\\.wap\\.wmlscriptc|vnd\\.wap\\.wmlc)?" />
+		</and>
+	</Matcher>
+
+	<Matcher name="bin">
+		<and>
+			<property type="responseCode" value="200" />
+			<property type="response" name="Content-Type"
+				value="(image|audio|video|audio)/[\\w\\+\\-\\.]+" />
+		</and>
+	</Matcher>
+
+	<Matcher name="binExpr">
+		<!-- param:$(Content-Type)/$(size)/$(responseCode) -->
+		<and>
+			<variable name="binExpr" value="(image|audio|video|audio)/[\w\+\-\.]+$" />
+			<variable name="crc" value="crc($(content))" />
+			<variable name="maxSize" value="10000" />
+			<variable name="expectedCRC" value="103547413" />
+
+			<property name="checkType" value="equals(regex($(binExpr),$(Content-Type)),true)" />
+			<property name="checkSize" value="equals(compare($(size),$(maxSize)),-1)" />
+			<property name="checkCRC" value="equals(compare($(crc),$(expectedCRC)),0)" />
+		</and>
+	</Matcher>
+
+</HttpMatcher>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<plugins>
+
+<plugin id="i18n" >
+  <provider description="" version="1.0"   provider-name="UILOGIC"/>
+  <extension point="root.AttrWillUpdatePoint" class="org.lx.gui.dui.plug.i18n.I18nPlug"/>
+  <types>
+      <type id="J2SE"/>
+      <type id="SWT"/>
+  </types>
+    
+  <dependencies/>
+
+</plugin>
+</plugins>

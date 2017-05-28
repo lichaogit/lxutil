@@ -45,3 +45,11 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+.svn
+*.bak
+*.scc
+#ignore directories
+/bin
+/classes
+/lib

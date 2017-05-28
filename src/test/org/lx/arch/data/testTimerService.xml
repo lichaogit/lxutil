@@ -1,0 +1,541 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<test>
+
+	<base>
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+		</TimerService>
+	</base>
+
+	<case_jobChange1 name="case_jobChange1">
+		<!--change job's trigger -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item></item>
+			</jobAdd>
+			<jobChange>
+				<item name="crawler_tianya" group="daily"></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item name="crawler_tianya" group="daily"></item>
+			</triggerDelete>
+		</results>
+	</case_jobChange1>
+
+	<case_jobRemove name="case_jobRemove">
+		<!--remove a job -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+
+
+		</TimerService>
+		<results>
+			<jobAdd>
+			</jobAdd>
+			<jobChange>
+			</jobChange>
+			<jobDelete>
+				<item name="crawler_tianya" group="daily"></item>
+			</jobDelete>
+
+			<triggerAdd>
+			</triggerAdd>
+			<triggerChange>
+			</triggerChange>
+			<triggerDelete>
+				<item name="crawler_tianya" group="daily"></item>
+			</triggerDelete>
+		</results>
+	</case_jobRemove>
+
+	<case_jobAdd name="case_jobAdd">
+		<!--add a job -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_sina" group="daily" command="crawl" trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item name="crawler_sina" group="daily"></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item></item>
+			</triggerDelete>
+		</results>
+	</case_jobAdd>
+
+	<case_jobAdd name="case_jobAdd1">
+		<!--add a job -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<!--add a new job existed in testConfigurationView -->
+				<Job name="crawler_X1" group="daily" command="crawl" trigger="crawler_baidu">
+					<parameter name="url" value="http://www.baidu.com" />
+				</Job>
+
+				<!--add a new job dosen't existed in testConfigurationView -->
+				<!--expected:this job is bypassed by the TimerService -->
+				<Job name="crawler_X2" group="daily" command="crawl" trigger="crawler_X">
+					<parameter name="url" value="http://www.baidu.com" />
+				</Job>
+
+
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item name="crawler_X1" group="daily"></item>
+				<item name="crawler_X2" group="daily"></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item></item>
+			</triggerDelete>
+		</results>
+	</case_jobAdd>
+	<case_jobAdd name="case_jobAdd2">
+		<!--add a job -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+
+				<Trigger name="crawler_X" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<!--add a new job existed in testConfigurationView,the crawler_X is newer. -->
+				<Job name="crawler_X1" group="daily" command="crawl" trigger="crawler_X">
+					<parameter name="url" value="http://www.baidu.com" />
+				</Job>
+
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item name="crawler_X1" group="daily"></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item name="crawler_X" group="daily" ></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item></item>
+			</triggerDelete>
+		</results>
+	</case_jobAdd>
+	<case_jobAdd name="case_jobAdd3">
+		<!--add a job -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+				<Trigger name="crawler_X" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<!-- multi jobs add to one trigger. -->
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_X">
+					<parameter name="url" value="http://www.baidu.com" />
+				</Job>
+
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item ></item>
+			</jobAdd>
+			<jobChange>
+				<item name="crawler_tianya" group="daily" ></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item name="crawler_X" group="daily" ></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item></item>
+			</triggerDelete>
+		</results>
+	</case_jobAdd>
+
+	<trigger_Add1 name="trigger_Add1">
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_sina" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item></item>
+			</triggerDelete>
+		</results>
+
+	</trigger_Add1>
+
+	<trigger_Add2 name="trigger_Add2">
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_sina" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_sina" group="daily" command="crawl" trigger="crawler_sina">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item name="crawler_sina" group="daily"></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item name="crawler_sina" group="daily"></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item></item>
+			</triggerDelete>
+		</results>
+	</trigger_Add2>
+
+
+	<trigger_change name="trigger_change">
+		<!--change the value -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily" value="0/20 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item></item>
+			</triggerAdd>
+			<triggerChange>
+				<item name="crawler_baidu" group="daily"></item>
+			</triggerChange>
+			<triggerDelete>
+				<item></item>
+			</triggerDelete>
+		</results>
+
+	</trigger_change>
+
+	<trigger_delete1 name="trigger_delete1">
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+			</Jobs>
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item name="crawler_baidu" group="daily"></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item name="crawler_baidu" group="daily"></item>
+			</triggerDelete>
+		</results>
+	</trigger_delete1>
+
+
+	<trigger_delete2 name="trigger_delete2">
+		<!--abnormal delete -->
+		<TimerService>
+			<!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express" -->
+				<Trigger name="crawler_tianya" group="daily" value="0/20 * * * * ?" />
+
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url" value="http://focus.tianya.cn/" /> <parameter 
+						name="deep" value="1" / -->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl" trigger="crawler_baidu">
+					<!-- parameter name="url" value="http://www.baidu.com" / -->
+				</Job>
+			</Jobs>
+		</TimerService>
+		<results>
+			<jobAdd>
+				<item></item>
+			</jobAdd>
+			<jobChange>
+				<item></item>
+			</jobChange>
+			<jobDelete>
+				<item></item>
+			</jobDelete>
+
+			<triggerAdd>
+				<item></item>
+			</triggerAdd>
+			<triggerChange>
+				<item></item>
+			</triggerChange>
+			<triggerDelete>
+				<item name="crawler_baidu" group="daily"></item>
+			</triggerDelete>
+		</results>
+
+	</trigger_delete2>
+</test>

@@ -1,0 +1,176 @@
+<project name="GameServer" default="all" basedir=".">
+	<description>
+		build the GameServer project
+	</description>
+
+	<!-- set global properties for this build -->
+	<tstamp>
+		<format property="buildyear" pattern="yyyy" />
+	</tstamp>
+	<tstamp>
+		<format property="buildtime" pattern="yyyyMMdd-hhmmss" />
+	</tstamp>
+	<tstamp>
+		<format property="filetamp" pattern="yyMMdd" />
+	</tstamp>
+	<tstamp>
+		<format property="release_date" pattern="yyyyMMdd" />
+	</tstamp>
+
+
+	<!-- include the build's properties -->
+	<property file="build.properties" />
+	<property name="product_name" value="${ant.project.name}-${ver}" />
+	<property name="product_path" value="${release.dir}/lib/${product_name}.jar" />
+	<property name="latest_dir" value="${release_base.dir}/latest" />
+
+	<path id="classpath.javac">
+		<pathelement location="${lib3rd}" />
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${lib3rd}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<path id="build.tools">
+		<pathelement location="lib/retroguard.jar" />
+		<pathelement location="lib/junit-4.12.jar" />
+		<path refid="classpath.javac" />
+	</path>
+
+	<property name="classpath" refid="build.tools" />
+
+	<target name="init">
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<echo message="classpath=${classpath}" />
+		<!-- check the dependent class -->
+		<fail
+			message="Missing library: can not find all neccessary class in '${classpath}'">
+			<condition>
+				<and>
+					<not>
+						<available classname="org.htmlparser.lexer.Page"
+							classpath="${classpath}" />
+					</not>
+					<not>
+						<available classname="org.dom4j.Node" classpath="${classpath}" />
+					</not>
+				</and>
+			</condition>
+		</fail>
+
+		<!-- Compile the java code from ${src.dir} into ${build.dir} -->
+		<javac encoding="${JAVAC_ENCOEDING}" srcdir="${src.dir}/org/lx"
+			destdir="${build.dir}" debug="${debug}" debuglevel="lines,vars,source"
+			classpath="${classpath}">
+			<include name="**/*.java" />
+		</javac>
+		<javac encoding="${JAVAC_ENCOEDING}" srcdir="${src.dir}/test"
+			destdir="${build.dir}" debug="${debug}" debuglevel="lines,vars,source"
+			classpath="${classpath}">
+			<include name="org/lx/**/*.java" />
+			<include name="AllTests.java" />
+		</javac>
+		<copy todir="${build.dir}/org/lx">
+			<fileset dir="${src.dir}/org/lx">
+				<include name="**/*.xsl" />
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="rt" depends="compile" description="retroguard">
+		<!-- check the dependent class -->
+		<fail message="Miss retroguard library: can not find it in '${classpath}'">
+			<condition>
+				<not>
+					<available classname="RetroGuard" classpath="${classpath}" />
+				</not>
+			</condition>
+		</fail>
+		<mkdir dir="${rt_release.dir}" />
+
+		<copy todir="${rt_release.dir}">
+			<fileset file="${release.dir}/**" />
+		</copy>
+
+		<java fork="yes" classname="RetroGuard" classpath="${classpath}">
+			<arg line="${product_path}" />
+			<arg line="${rt_release.dir}/lib/${product_name}.jar" />
+			<arg line="${rt.script}" />
+			<arg line="${rt.log}" />
+		</java>
+	</target>
+
+
+	<target name="release" description="build the release package">
+		<mkdir dir="${target.dir}" />
+		<zip destfile="${target.dir}/pages_${filetamp}.zip">
+			<zipfileset dir="./pages" prefix="pages">
+				<include name="**/*.php" />
+				<include name="**/*.js" />
+				<include name="**/*.css" />
+				<exclude name="wc_define.php" />
+				<exclude name="adm/install_define.php" />
+				<exclude name="testdata/**" />
+			</zipfileset>
+		</zip>
+		<zip destfile="${target.dir}/gs_${filetamp}.zip">
+			<zipfileset dir=".">
+				<include name="lib/ty/*.*" />
+			</zipfileset>
+			<zipfileset dir="${release.dir}">
+				<include name="lib/*.*" />
+				<include name="plugins/*.*" />
+			</zipfileset>
+		</zip>
+	</target>
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build.dir} and ${release.dir} directory trees -->
+		<delete dir="${build.dir}" />
+		<delete dir="${target.dir}" />
+		<delete file="${latest_dir}/lib/${product_name}.jar" />
+		<delete dir="${latest_dir}">
+		</delete>
+	</target>
+
+	<target name="test" description="unit test">
+		<java fork="yes" classname="${test_entry}"
+			classpath="${product_path}:${license.dir}/${ant.project.name}_lic.jar:${classpath}">
+			<arg line="${test_suite}" />
+		</java>
+	</target>
+
+	<target name="all" depends="clean,compile,release,rt"
+		description="build the license writer">
+		<zip destfile="${target.dir}/${product_name}_release_${filetamp}.zip">
+			<fileset dir="${rt_release.dir}">
+				<exclude name="**/Thumbs.db" />
+			</fileset>
+			<fileset dir=".">
+				<include name="*.pdf" />
+			</fileset>
+		</zip>
+
+		<tar destfile="${target.dir}/${product_name}_release.tar">
+			<tarfileset dir="${rt_release.dir}">
+				<exclude name="**/Thumbs.db" />
+			</tarfileset>
+			<tarfileset dir=".">
+				<include name="*.pdf" />
+			</tarfileset>
+		</tar>
+
+		<gzip zipfile="${target.dir}/${product_name}_release_${filetamp}.tar.gz"
+			src="${target.dir}/${product_name}_release.tar" />
+
+		<delete file="${target.dir}/${product_name}_release.tar" />
+	</target>
+
+</project>

@@ -1,0 +1,432 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<testItem version="1.0">
+	<testRegex>
+		<regex>
+			<item name="numberFormat">
+			<![CDATA[
+			(?n)(?<=\d)(?<!\.\d*)(?=(\d{3})+(\.|$))
+			]]>
+			</item>
+
+			<item name="DEFAULT_DOMAIN_MATCHER">
+			<![CDATA[
+			(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}\.?
+			]]>
+			</item>
+
+			<item name="DEFAULT_URLDOMAIN_MATCHER">
+			<![CDATA[
+			(?:(https?|ftp|file)\:\/\/){1}($(DEFAULT_DOMAIN_MATCHER))(?:\:(\d{1,5})){0,1}
+			]]>
+			</item>
+
+			<item name="FUNCTION_MATCHER">
+			<![CDATA[
+            (\w+){1}\((.+)\){1}
+			]]>
+			</item>
+
+			<item name="PARAMETER_STRING_SEPERATOR">
+				<comments>
+			    <![CDATA[
+				不包含""内部的，
+			    ]]>
+				</comments>
+			<![CDATA[
+			(?<!\"[^,]+),(?![^,]+\")
+			]]>
+			</item>
+
+			<item name="PARAMETER_PARSER">
+			<![CDATA[
+            -f\s*(\w+)\s*(.*?)\s*(?:(?=-f)|\s*$)
+			]]>
+			</item>
+
+			<item name="REMOVE_DUP_NUM">
+			<![CDATA[
+			((\d)\d*?)\2
+			]]>
+			</item>
+
+			<item name="DEFAULT_PROXYSERVER_MATCHER">
+			<![CDATA[
+            (?:(https?|socks[4|5])\:\/\/){1}(?:(\S+)\:(\S+)@)?($(DEFAULT_DOMAIN_MATCHER))(?:\:(\d{1,5}))?
+			]]>
+			</item>
+
+		</regex>
+		<replace>
+			<!-- Java don't support this -->
+			<!-- item regex="PARAMETER_STRING_SEPERATOR" with="-"> <src> <![CDATA[ 
+				11211,210161,"SHRINK FILM, 23 W X .0015MIL",49.95,RM1 ,1 ]]> </src> <result> 
+				<![CDATA[ 11211-210161-"SHRINK FILM, 23 W X .0015MIL"-49.95-RM1 -1 ]]> </result> 
+				</item -->
+
+			<!-- item regex="REMOVE_DUP_NUM" with="$1" src="8912341253789" result="89123457" 
+				/ -->
+		</replace>
+
+		<parser>
+			<item regex="PARAMETER_PARSER">
+				<string>
+			    <![CDATA[
+			    create_record -f Description "TTest2 in oslc " is wrong" "  -f Headline "OSLC TEST2"-f TargetItemCategory Software 
+    			]]>
+				</string>
+				<matcher>
+					<group>
+        			<![CDATA[
+        			  -f Description "TTest2 in oslc " is wrong" "
+    	            ]]>
+					</group>
+					<group value="Description" />
+					<group>
+        			<![CDATA[
+        			  "TTest2 in oslc " is wrong" "
+    	            ]]>
+					</group>
+				</matcher>
+				<matcher>
+					<group>
+        			<![CDATA[
+        			  -f Headline "OSLC TEST2"
+    	            ]]>
+					</group>
+					<group value="Headline" />
+					<group>
+        			<![CDATA[
+        			  "OSLC TEST2"
+    	            ]]>
+					</group>
+				</matcher>
+
+				<matcher>
+					<group>
+        			<![CDATA[
+        			  -f TargetItemCategory Software
+    	            ]]>
+					</group>
+					<group value="TargetItemCategory" />
+					<group value="Software" />
+				</matcher>
+			</item>
+
+			<item regex="FUNCTION_MATCHER">
+				<string>
+			    <![CDATA[
+			    isInArray($(ip),getconfig(blacklist.ip))
+    			]]>
+				</string>
+				<matcher>
+					<group value="isInArray($(ip),getconfig(blacklist.ip))" />
+					<group value="isInArray" />
+					<group value="$(ip),getconfig(blacklist.ip)" />
+				</matcher>
+			</item>
+
+
+			<item regex="DEFAULT_URLDOMAIN_MATCHER">
+				<string>
+			    <![CDATA[
+			    http://a.b.com/as.aspx?sds=23
+    			]]>
+				</string>
+				<matcher>
+					<group value="http://a.b.com" />
+					<group value="http" />
+					<group value="a.b.com" />
+				</matcher>
+			</item>
+
+			<item regex="DEFAULT_URLDOMAIN_MATCHER">
+				<string>
+			    <![CDATA[
+			    http://a.b.com./as.aspx?sds=23
+    			]]>
+				</string>
+				<matcher>
+					<group value="http://a.b.com." />
+					<group value="http" />
+					<group value="a.b.com." />
+				</matcher>
+			</item>
+
+			<item regex="DEFAULT_URLDOMAIN_MATCHER">
+				<string>
+			    <![CDATA[
+			    http://a.b.com:888/as.aspx?sds=23&d=2&c=%98
+    			]]>
+				</string>
+
+				<matcher>
+					<group value="http://a.b.com:888" />
+					<group value="http" />
+					<group value="a.b.com" />
+					<group value="888" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_URLDOMAIN_MATCHER">
+				<string>
+			    <![CDATA[
+			    http://a.b.com.:888/as.aspx?sds=23&d=2&c=%98
+    			]]>
+				</string>
+				<matcher>
+					<group value="http://a.b.com.:888" />
+					<group value="http" />
+					<group value="a.b.com." />
+					<group value="888" />
+				</matcher>
+			</item>
+
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    http://domain\user._-zhao:passwd!!@#$%^&*()_+-=,./<>?@www.abc.com:8888
+    			]]>
+				</string>
+				<matcher>
+					<group index="1" value="http" />
+					<group index="2" value="domain\user._-zhao" />
+					<group index="3" value="passwd!!@#$%^&amp;*()_+-=,./&lt;&gt;?" />
+					<group index="4" value="www.abc.com" />
+					<group index="5" value="8888" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    socks5://user:passwd@www.abc.com:8888
+    			]]>
+				</string>
+				<matcher>
+					<group index="1" value="socks5" />
+					<group index="2" value="user" />
+					<group index="3" value="passwd" />
+					<group index="4" value="www.abc.com" />
+					<group index="5" value="8888" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    socks5://www.abc.com:8888
+    			]]>
+				</string>
+				<matcher>
+					<group index="1" value="socks5" />
+					<group index="4" value="www.abc.com" />
+					<group index="5" value="8888" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    socks5://user:passwd@www.abc.com
+    			]]>
+				</string>
+				<matcher>
+					<group index="1" value="socks5" />
+					<group index="2" value="user" />
+					<group index="3" value="passwd" />
+					<group index="4" value="www.abc.com" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    socks5://www.abc.com
+    			]]>
+				</string>
+				<matcher>
+					<group index="1" value="socks5" />
+					<group index="4" value="www.abc.com" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    socks4://user:passwd@www.abc.com:8888
+    			]]>
+				</string>
+				<matcher>
+					<group index="1" value="socks4" />
+					<group index="2" value="user" />
+					<group index="3" value="passwd" />
+					<group index="4" value="www.abc.com" />
+					<group index="5" value="8888" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    http://user:passwd@www.abc.com:8888
+			    ]]>
+				</string>
+				<matcher>
+					<group index="1" value="http" />
+					<group index="2" value="user" />
+					<group index="3" value="passwd" />
+					<group index="4" value="www.abc.com" />
+					<group index="5" value="8888" />
+				</matcher>
+			</item>
+			<item regex="DEFAULT_PROXYSERVER_MATCHER">
+				<string>
+			    <![CDATA[
+			    https://user:passwd@www.abc.com:8888
+    			]]>
+				</string>
+				<matcher>
+					<group index="1" value="https" />
+					<group index="2" value="user" />
+					<group index="3" value="passwd" />
+					<group index="4" value="www.abc.com" />
+					<group index="5" value="8888" />
+				</matcher>
+			</item>
+		</parser>
+	</testRegex>
+
+	<testMIMEMatcher>
+		<item name="application/acad" type="binary" />
+		<item name="application/applefile" type="binary" />
+		<item name="application/astound" type="binary" />
+		<item name="application/dsptype" type="binary" />
+		<item name="application/dxf" type="binary" />
+		<item name="application/futuresplash" type="binary" />
+		<item name="application/gzip" type="binary" />
+		<item name="application/listenup" type="binary" />
+		<item name="application/mac-binhex40" type="binary" />
+		<item name="application/mbedlet" type="binary" />
+		<item name="application/mif" type="binary" />
+		<item name="application/msexcel" type="binary" />
+		<item name="application/mshelp" type="binary" />
+		<item name="application/mspowerpoint" type="binary" />
+		<item name="application/msword" type="binary" />
+		<item name="application/octet-stream" type="binary" />
+		<item name="application/oda" type="binary" />
+		<item name="application/pdf" type="binary" />
+		<item name="application/postscript" type="binary" />
+		<item name="application/rtc" type="binary" />
+		<item name="application/rtf" type="binary" />
+		<item name="application/studiom" type="binary" />
+		<item name="application/toolbook" type="binary" />
+		<item name="application/vocaltec-media-desc" type="binary" />
+		<item name="application/vocaltec-media-file" type="binary" />
+		<item name="application/xhtml+xml" type="text" />
+		<item name="application/xml" type="text" />
+		<item name="application/x-bcpio" type="binary" />
+		<item name="application/x-compress" type="binary" />
+		<item name="application/x-cpio" type="binary" />
+		<item name="application/x-csh" type="text" />
+		<item name="application/x-director" type="binary" />
+		<item name="application/x-dvi" type="binary" />
+		<item name="application/x-envoy" type="binary" />
+		<item name="application/x-gtar" type="binary" />
+		<item name="application/x-hdf" type="binary" />
+		<item name="application/x-httpd-php" type="text" />
+		<item name="application/x-javascript" type="text" />
+		<item name="application/x-latex" type="binary" />
+		<item name="application/x-macbinary" type="binary" />
+		<item name="application/x-mif" type="binary" />
+		<item name="application/x-netcdf" type="binary" />
+		<item name="application/x-nschat" type="binary" />
+		<item name="application/x-sh" type="text" />
+		<item name="application/x-shar" type="binary" />
+		<item name="application/x-shockwave-flash" type="binary" />
+		<item name="application/x-sprite" type="binary" />
+		<item name="application/x-stuffit" type="binary" />
+		<item name="application/x-supercard" type="binary" />
+		<item name="application/x-sv4cpio" type="binary" />
+		<item name="application/x-sv4crc" type="binary" />
+		<item name="application/x-tar" type="binary" />
+		<item name="application/x-tcl" type="text" />
+		<item name="application/x-tex" type="binary" />
+		<item name="application/x-texinfo" type="binary" />
+		<item name="application/x-troff" type="binary" />
+		<item name="application/x-troff-man" type="binary" />
+		<item name="application/x-troff-me" type="binary" />
+		<item name="application/x-troff-ms" type="binary" />
+		<item name="application/x-ustar" type="binary" />
+		<item name="application/x-wais-source" type="binary" />
+		<item name="application/x-www-form-urlencoded" type="binary" />
+		<item name="application/zip" type="binary" />
+		<item name="audio/basic" type="binary" />
+		<item name="audio/echospeech" type="binary" />
+		<item name="audio/tsplayer" type="binary" />
+		<item name="audio/voxware" type="binary" />
+		<item name="audio/x-aiff" type="binary" />
+		<item name="audio/x-dspeeh" type="binary" />
+		<item name="audio/x-midi" type="binary" />
+		<item name="audio/x-mpeg" type="binary" />
+		<item name="audio/x-pn-realaudio" type="binary" />
+		<item name="audio/x-pn-realaudio-plugin" type="binary" />
+		<item name="audio/x-qt-stream" type="binary" />
+		<item name="audio/x-wav" type="binary" />
+		<item name="drawing/x-dwf" type="binary" />
+		<item name="image/cis-cod" type="binary" />
+		<item name="image/cmu-raster" type="binary" />
+		<item name="image/fif" type="binary" />
+		<item name="image/gif" type="binary" />
+		<item name="image/ief" type="binary" />
+		<item name="image/jpeg" type="binary" />
+		<item name="image/png" type="binary" />
+		<item name="image/tiff" type="binary" />
+		<item name="image/vasa" type="binary" />
+		<item name="image/vnd.wap.wbmp" type="binary" />
+		<item name="image/x-freehand" type="binary" />
+		<item name="image/x-portable-anymap" type="binary" />
+		<item name="image/x-portable-bitmap" type="binary" />
+		<item name="image/x-portable-graymap" type="binary" />
+		<item name="image/x-portable-pixmap" type="binary" />
+		<item name="image/x-rgb" type="binary" />
+		<item name="image/x-windowdump" type="binary" />
+		<item name="image/x-xbitmap" type="binary" />
+		<item name="image/x-xpixmap" type="binary" />
+		<item name="message/external-body" type="binary" />
+		<item name="message/http" type="binary" />
+		<item name="message/news" type="binary" />
+		<item name="message/partial" type="binary" />
+		<item name="message/rfc822" type="binary" />
+		<item name="model/vrml" type="binary" />
+		<item name="multipart/alternative" type="binary" />
+		<item name="multipart/byteranges" type="binary" />
+		<item name="multipart/digest" type="binary" />
+		<item name="multipart/encrypted" type="binary" />
+		<item name="multipart/form-data" type="binary" />
+		<item name="multipart/mixed" type="binary" />
+		<item name="multipart/parallel" type="binary" />
+		<item name="multipart/related" type="binary" />
+		<item name="multipart/report" type="binary" />
+		<item name="multipart/signed" type="binary" />
+		<item name="multipart/voice-message" type="binary" />
+		<item name="text/comma-separated-values" type="text" />
+		<item name="text/css" type="text" />
+		<item name="text/html" type="text" />
+		<item name="text/html; Charset=gbk" type="text" />
+		<item name="text/javascript" type="text" />
+		<item name="text/plain" type="text" />
+		<item name="text/richtext" type="text" />
+		<item name="text/rtf" type="text" />
+		<item name="text/tab-separated-values" type="text" />
+		<item name="text/vnd.wap.wml" type="text" />
+		<item name="application/vnd.wap.wmlc" type="text" />
+		<item name="text/vnd.wap.wmlscript" type="text" />
+		<item name="application/vnd.wap.wmlscriptc" type="text" />
+		<item name="text/xml" type="text" />
+		<item name="text/xml-external-parsed-entity" type="text" />
+		<item name="text/x-setext" type="text" />
+		<item name="text/x-sgml" type="text" />
+		<item name="text/x-speech" type="text" />
+		<item name="video/mpeg" type="binary" />
+		<item name="video/quicktime" type="binary" />
+		<item name="video/vnd.vivo" type="binary" />
+		<item name="video/x-msvideo" type="binary" />
+		<item name="video/x-sgi-movie" type="binary" />
+		<item name="workbook/formulaone" type="binary" />
+		<item name="x-world/x-3dmf" type="binary" />
+		<item name="x-world/x-vrml" type="binary" />
+	</testMIMEMatcher>
+</testItem>

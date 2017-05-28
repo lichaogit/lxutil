@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xsl_lib>
+<!--tianya.cn-->
+  <!--tianya.cn default pub matcher
+  
+  e.g:
+  http://cache.tianya.cn/publicforuM/Content/stocks/1/328707.shtml  
+  -->
+  <matcher sensitive="false" regex="http[s]{0,1}://([[^\s]-]+\.)+tianya[[^\s]-]*pub([[^\s]- ./?%&amp;=]*)?">
+    <xsl url="ty4.01.xsl"/>
+    <!--step means the refersh step in seconds if value equals true-->
+    <refresh value="not(contains(string((/root/HTML/BODY//*[(name()='DIV' or name()='TABLE') and count(.//DIV)=0 and count(.//TABLE)=0 and contains(string(.),'分页链接')])[1]),'下一页'))" step="300" />
+    <params>
+      <namespace name="abcd" value="http://www.w3.org/1999/xhtml"/>
+      <param name="title" value="/root/abcd:HTML//abcd:TITLE/text()"/>
+    </params>
+  </matcher>
+                    
+  <!--
+  tianya city matcher
+  http://bbs.city.tianya.cn/new/TianyaCity/Content.asp?idWriter=0&Key=0&idItem=41&idArticle=735983&page_num=1
+  -->
+  <matcher sensitive="false" regex="http[s]{0,1}://([[^\s]-]+\.)+tianya[[^\s]-]*TianyaCity([[^\s]- ./?%&amp;=]*)?">
+    <xsl url="ty_city1.0.xsl"/>
+    <refresh value="not(contains(string((/root/HTML/BODY//*[(name()='DIV' or name()='TABLE') and count(.//DIV)=0 and count(.//TABLE)=0 and contains(string(.),'分页链接')])[1]),'下一页'))" step="300" />
+    <params>
+      <namespace name="abcd" value="http://www.w3.org/1999/xhtml"/>
+      <param name="title" value="/root/HTML//TITLE/text()"/>
+    </params>
+  </matcher>
+
+  <!--
+  tianya tech matcher
+  -->
+  <matcher sensitive="false" regex="http[s]{0,1}://([[^\s]-]+\.)+tianya[[^\s]-]*tech([[^\s]- ./?%&amp;=]*)?">
+    <xsl url="ty_tech4.0.xsl"/>
+    <refresh value="not(contains(string((/root/HTML/BODY//*[(name()='DIV' or name()='TABLE') and count(.//DIV)=0 and count(.//TABLE)=0 and contains(string(.),'总页数')])[1]),'下一页'))" step="300" />
+    <params>
+      <namespace name="abcd" value="http://www.w3.org/1999/xhtml"/>
+      <param name="title" value="/root/HTML//TITLE/text()"/>
+    </params>
+  </matcher>
+
+  <!--
+  tianya groups matcher
+  -->
+  <matcher sensitive="false" regex="http[s]{0,1}://([[^\s]-]+\.)*groups.tianya[[^\s]-]+ShowArticle.asp([[^\s]- ./?%&amp;=]*)?">
+    <xsl url="ty_groups1.0.xsl"/>
+    <refresh value="not(contains(string((/root/HTML/BODY//*[(name()='DIV' or name()='TABLE') and count(.//DIV)=0 and count(.//TABLE)=0 and contains(string(.),'总页数')])[1]),'下一页'))" step="300" />
+    <params>
+      <namespace name="abcd" value="http://www.w3.org/1999/xhtml"/>
+      <param name="title" value="/root/HTML//TITLE/text()"/>
+    </params>
+  </matcher>
+  
+  <!--
+  tianya.cn default matcher
+  -->
+  <matcher sensitive="false" regex="http[s]{0,1}://([[^\s]-]+\.)+tianya[[^\s]-]+([[^\s]- ./?%&amp;=]*)?">
+    <xsl url="ty3.0.xsl"/>
+    <refresh value="not(contains(string((/root/HTML/BODY//*[(name()='DIV' or name()='TABLE') and count(.//DIV)=0 and count(.//TABLE)=0 and contains(string(.),'分页链接')])[1]),'下一页'))" step="900"/>
+    <params>
+      <namespace name="abcd" value="http://www.w3.org/1999/xhtml"/>
+      <param name="title" value="/root/HTML//TITLE/text()"/>
+    </params>
+  </matcher>
+
+  <!--
+  default matcher
+  >
+  <matcher sensitive="false" regex="http[s]{0,1}://([[^\s]-]+\.)+[[^\s]-]+([[^\s]- ./?%&amp;=]*)?">
+    <xsl url="passthru.xsl"/>
+    <refresh value="true" />
+  </matcher-->
+  
+</xsl_lib>
+

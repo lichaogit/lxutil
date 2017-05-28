@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<configuration version="1.0">
+	<configdb>
+	  <property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/webcontent"/>
+	  <property name="hibernate.connection.username" value="root"/>
+	  <property name="hibernate.connection.password" value="zlazlx"/>
+	</configdb>
+
+	<frontEnd port="9002" host="127.0.0.1" soTimeout="0"
+		reuseAddress="true" tcpNoDelay="true" OOBInline="true"
+		keepAlive="true">
+		<!--the timeout means the server will close the socket if the timer expired-->
+		<!--front end thread pool setting.-->
+		<threadPool threadCount="2" pollInterval="500" waitTime="30000" />
+		
+		<plugins dir="plugins">
+			<builtin>
+
+				<XslLibrary value="xsl/urlRule.xml" />
+
+				<!--The headers need to passthrough the real target server-->
+				<httpPassthroughHeaders>
+					<header>Content-Type</header>
+					<header>User-Agent</header>
+					<header>Accept</header>
+					<header>Accept-Charset</header>
+					<header>Accept-Language</header>
+					<header>Authorization</header>
+				</httpPassthroughHeaders>
+				<!--The headers need to log when client visit-->
+				<httpLogHeaders>
+					<header>User-Agent</header>
+					<header>Accept</header>
+					<header>Accept-Charset</header>
+					<header>Accept-Language</header>
+					<header>Accept-Encoding</header>
+					<header>UA-CPU</header>
+				</httpLogHeaders>
+
+				<xsltServer>
+					<threadPool threadCount="5" pollInterval="500"
+						waitTime="30000" />
+				</xsltServer>
+
+				<Crawler
+					linkParser="//*[local-name() = 'A' and starts-with(@href,'http')]/@href">
+					<httpClient>
+						<threadPool threadCount="3" pollInterval="-1"
+							waitTime="180000" />
+					</httpClient>
+
+					<rules>
+						<!--rule urlExpress="http://focus.tianya.cn/" mode="[include/exclude]" accessMode="[cookie/post/cert]" account="" password="" /-->
+						<rule
+							urlExpress="^http[s]?://([[^\s]-]+\.)+tianya\.cn.*">
+							<parameter name="mode" value="include" />
+							<parameter name="method" value="get" />
+							<parameter name="userName" value="lichao" />
+							<parameter name="password" value="xxx" />
+						</rule>
+
+						<!-- exclude the links that don't match the above rule.-->
+						<rule urlExpress=".*" mode="exclude">
+							<parameter name="mode" value="exclude" />
+						</rule>
+					</rules>
+				</Crawler>
+			</builtin>
+		</plugins>
+
+		<TimerService>
+		    <!-- the schedule and the job use the same group name here -->
+			<Triggers>
+				<!--schedule name="" value="cron express"-->
+				<Trigger name="crawler_tianya" group="daily"
+					value="0/20 * * * * ?" />
+				<Trigger name="crawler_baidu" group="daily"
+					value="0/10 * * * * ?" />
+			</Triggers>
+
+			<Jobs>
+				<Job name="crawler_tianya" group="daily" command="crawl"
+					trigger="crawler_tianya">
+					<!-- parameter name="url"
+						value="http://focus.tianya.cn/" />
+						<parameter name="deep" value="1" /-->
+				</Job>
+				<Job name="crawler_baidu" group="daily" command="crawl"
+					trigger="crawler_baidu">
+					<!-- parameter name="url"
+						value="http://www.baidu.com" /-->
+				</Job>
+			</Jobs>
+		</TimerService>
+	</frontEnd>
+</configuration>
